@@ -1,0 +1,50 @@
+原题链接(洛谷)
+https://www.luogu.com.cn/problem/P1216
+
+思路：
+当遍历来到第i行，第i-1行已经取到了最优解，故可利用
+定义dp[i][j]，表示第i行第j个的最优状态
+
+因为对于每个结点，可走到左下角或右下角
+易知对当前结点(a[i][j])来说可以利用的上一行的最优状态为max(dp[i-1][j],dp[i-1][j-1]);
+到当前位置即加上本身  即max(dp[i-1],dp[i-1][j-1])+a[i][j]
+
+易知ans为dp数组中的最大值
+
+//AC代码
+#include<iostream>
+using namespace std;
+#define maxn 1001
+
+int a[maxn][maxn];//可以不用定义dp数组，利用原数组即可
+
+int main()
+{
+	int ans=0; 
+	int N;
+	cin>>N;
+	for(int i=1;i<=N;i++)
+		for(int j=1;j<=i;j++)
+			cin>>a[i][j];
+	for(int i=2;i<=N;i++)
+	{
+		for(int j=1;j<=i;j++)
+		{
+			//这三个选择结构可以合并，但我觉得这样清晰点 
+			if(j==1) 
+			{
+				a[i][j]+=a[i-1][j];
+			}
+			else if(j==i)
+			{
+				a[i][j]+=a[i-1][j-1];
+			}
+			else
+			{
+				a[i][j]+=max(a[i-1][j],a[i-1][j-1]);
+			}
+			ans=max(a[i][j],ans);
+		}
+	}
+	cout<<ans<<endl;
+}
