@@ -1,0 +1,53 @@
+题目大致描述：
+给出两个字符串，分别挑出若干字符（保持原有顺序不变）各自组成新的字符串，这两个新字符串要相等
+求这个新字符串的最长长度
+
+思路：
+经典的求最长公共子序列问题（注意子串必须保证该新串在原串中是连续的，子序列则不一定连续）
+定义dp[i][j]，表示字符串a前i个字符与字符串b前j个字符能组成的相同字符串的长度
+
+那么对于a[i]==b[j]时，有dp[i][j]=dp[i-1][j-1]+1;//因为最长长度会在下标i-1和j-1的基础上再加一
+对于a[i]!=b[j]时，dp[i][j]=max(dp[i-1][j],dp[i][j-1]);//直接取前i-1或前j-1的状态
+
+然后鉴于字符串下标从一开始，防止出现下标为-1的情况，我将dp数组下标统一右移(下标可能与上面描述有不同，但思想是一样的)
+
+AC代码
+#include<iostream>
+using namespace std;
+#define maxn 1001
+
+int dp[maxn][maxn];
+
+int main()
+{
+	string a,b;
+	while(cin>>a>>b)
+	{
+		for(int i=0;i<maxn;i++)
+		{
+			for(int j=0;j<maxn;j++)
+			{
+				dp[i][j]=0;
+			}
+		}
+		for(int i=0;i<a.length();i++)
+		{
+			for(int j=0;j<b.length();j++)
+			{
+				if(a[i]==b[j])
+				{
+					dp[i+1][j+1]=dp[i][j]+1;
+				}
+				else
+				{
+					dp[i+1][j+1]=max(dp[i][j+1],dp[i+1][j]);
+				}
+			}
+		}
+		cout<<dp[a.length()][b.length()]<<endl;
+	}
+ } 
+
+
+
+
