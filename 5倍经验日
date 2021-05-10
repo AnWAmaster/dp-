@@ -1,0 +1,44 @@
+原题链接(洛谷)
+https://www.luogu.com.cn/problem/P1802
+
+思路：
+
+这题一看有股01背包那味，但还是有些变化
+如果输给第i个人，还可以有输的经验拿（不过变化也仅此而已了）
+
+#include<iostream>
+using namespace std;
+#define maxn 1001
+
+typedef long long ll;//如果用int会有一个样例WA
+
+struct enemy{
+	ll lose,win,num;
+}e[maxn];
+
+ll dp[maxn];
+
+int main()
+{
+	ll N,M;//人数和药数
+	cin>>N>>M;
+	for(ll i=1;i<=N;i++)
+	{
+		cin>>e[i].lose>>e[i].win>>e[i].num;
+	}
+	for(ll i=1;i<=N;i++)
+	{
+		for(ll j=M;j>=0;j--) //注意语句j>=0,因为题给数据会存在M==0
+		{
+			if(j>=e[i].num)
+			{
+				dp[j]=max(dp[j]+e[i].lose,dp[j-e[i].num]+e[i].win);//可能输的经验会比赢得经验更多，所以还是要取max
+			}
+			else
+			{
+				dp[j]=dp[j]+e[i].lose;
+			}
+		}
+	}
+	cout<<dp[M]*5<<endl;//别忘了*5
+} 
