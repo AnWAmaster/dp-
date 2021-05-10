@@ -1,0 +1,56 @@
+原题链接(洛谷)
+https://www.luogu.com.cn/problem/P1048
+
+思路：
+典型的01背包问题
+
+可以定义dp[i][j]为采前i棵药草、可用时间为j时得到的最大价值
+对于第i次采药，
+如果不采，得dp[i][j]=dp[i-1][j](就是同可用时间、采前i-1棵药草的价值)
+如果采，得dp[i][j]=dp[i-1][j-y[i].time]+y[i].val;//y[i]为第i棵药的结构体//j-y[i].time和+val即是花费时间获得价值的操作
+综合两种情况取最优解便是dp[i][j]=max(dp[i-1][j],dp[i-1][j-y[i].time]+y[i].val);
+
+对于该状态转移方程，发现采第i棵药只与采第i-1棵药的状态有关，于是带着一种迭代的思想，我们可以优化数组为一维(所谓的滚动数组)
+
+dp[j]表示剩余时间为j时得到的最大价值
+状态转移方程为dp[j]=max(dp[j],dp[j-y[i].time]+y[j].val);
+
+但是优化后的数组在遍历中如果和二维时一样会出现问题
+因为状态转移方程中，对于dp[j]会利用dp[j-y[i].time]的状态
+例如y[i].time=4,totaltime=9
+如果正序遍历 ,则会依次出现 
+dp[5]=max(dp[5],dp[1]+val);   dp[9]=max(dp[9],dp[5]+val);
+
+状态转移就是要以已求出的状态为基础得到新的状态
+在当前循环体开始前 dp[9]本该利用在上次该循环体结束后得到的dp[5]
+但dp[5]却又在dp[9]之前发生了变化，基础状态改变了，以该基础获得的值自然也不对了
+而逆序遍历就可以避免这种情况 
+//具体代码如下
+#include<iostream>
+using namespace std;
+
+struct yao{
+	int time;
+	int val;
+}y[101];
+
+int dp[1001];
+
+int main()
+{
+	int totaltime,num;
+	cin>>totaltime>>num;
+	for(int i=1;i<=num;i++)
+	{
+		cin>>y[i].time>>y[i].val;
+	}
+	for(int i=1;i<=num;i++)//遍历每棵药 
+	{
+		//注意这里是从totaltime开始，是逆序的 
+		for(int j=totaltime;j>=y[i].time;j--)
+		{
+			dp[j]=max(dp[j],dp[j-y[i].time]+y[i].val);
+		}
+	}
+	cout<<dp[totaltime]<<endl;//答案即为可用时间为totaltime时的状态
+}
