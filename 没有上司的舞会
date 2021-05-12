@@ -1,1 +1,135 @@
+题目链接：（VJ上做的，但是AcWing上有相同的题，这个也方便访问些）
+https://www.acwing.com/problem/content/287/
+
+题目大意：
+题目背景是进行一个派对
+给出职员数目和职员的“快乐值”(happy[i])
+因为职员间存在上下级关系，所以还给出一些某两位职员的上下级关系
+如果某职员的上司参加派对，则该职员不会参加
+题目要使这场派对的快乐值之和最大，求该最大值
+
+其实状态转移方程还是好写的
+
+设i为当前的一个职员，我们取他为上司时的情况
+定义dp[i][0]为i不去参加派对时的以他为根结点的这棵子树的快乐值之和
+    dp[i][1]为i去参加派对时的这棵子树的快乐值之和
+    
+设up为相对上司，down为该上司的下属
+1、上司参加派对
+则下属必定不去，只需上下属不去的情况，即dp[up][1]+=dp[down][0];
+2、上司不参加派对
+则下属可去可不去，这里就需要取最优解即取max了，即dp[up][0]+=max(dp[down][1],dp[down][0]);
+
+我感觉麻烦的还是数据的存储
+因为这些上下级关系用邻接矩阵存和邻接表存都有点不太好
+通过看题解和博客
+学到了链式前向星这种存储方式
+
+该方式也是存取每条边
+但是链式前向星用数组模拟了邻接表中对于同一顶点的多条分支的存储而使用的链表
+
+
+大致组成结构为：
+struct Edge{
+  int to;//该边的终点
+  int w;//该边的边权
+  int next;//与该边同起点的边当中，比该边先一次存储的边在edge[]数组中的下标
+}edge[maxn];
+int head[maxn];//对于结点i，head[i]表示以i为起点的边中的第一条边的在edge[]数组中的下标
+                                             //这个“第一条边”的理解请参考邻接表的存储方式
+一般构建方式为
+void add(int u,int v,int w)//传来了起点、终点、边权
+{
+	++edgecnt;//也可在代码块最后edgecnt++
+	e[edgecnt].to=v;
+  //注意看下面这两行
+	e[edgecnt].next=head[u];
+	head[u]=edgecnt;//这里是更新head[u]
+}
+应该不难发现，这里是用头插法存储一个顶点的多条边的
+
+那么如何遍历呢？
+知道了邻接表的遍历，这个应该也很容易迁移过来
+
+如果想遍历结点root的所有边
+则
+for(int i=head[root];i!=-1;i=e[i].next)
+初始化为head[root]就是从第一条边开始
+i=e[i].next就是去往下一条仍以结点root为起点的边
+i!=-1是因为一般会memset(head,-1,sizeof(-1));
+
+链式前向星就差不多这样了
+
+回到树状dp
+最终答案为最顶头上司的dp值
+设该上司下标为root
+即ans=max(dp[root][0],dp[root][1]);
+
+AC代码
+#include<iostream>
+#include<cstring>
+using namespace std;
+#define maxn 6010
+
+struct Edge{
+	int v,next;
+}e[maxn];
+
+int dp[maxn][2];
+bool has_fa[maxn];//用这个来找到顶头上司
+int head[maxn],happy[maxn];
+int edgecnt,N;
+
+void add(int u,int v)
+{
+	++edgecnt;
+	e[edgecnt].v=v;
+	e[edgecnt].next=head[u];
+	head[u]=edgecnt;
+}
+
+void dfs(int root)
+{
+	dp[root][1]=happy[root];//参加了的话快乐值至少为本身,没参加至少为0，故不用提前赋值
+	for(int i=head[root];i!=-1;i=e[i].next)
+	{
+		int j=e[i].v;
+		dfs(j);
+		dp[root][0]+=max(dp[j][0],dp[j][1]);//用+=是因为可能有多个子结点，是多叉树，要取子树最优解之和
+		dp[root][1]+=dp[j][0];//+=同理
+	}
+}
+
+int main()
+{
+	while(cin>>N&&N)
+	{
+		edgecnt=0;
+		memset(head,-1,sizeof head);
+		memset(dp,0,sizeof dp);
+		memset(has_fa,0,sizeof has_fa);
+		for(int i=1;i<=N;i++)
+		{
+			cin>>happy[i];
+		}
+		int up,down;
+		for(int i=1;i;i++)
+		{
+			cin>>down>>up;//下司，上司 
+			has_fa[down]=true;
+			if(down==0&&up==0)break;//用这个的原因是VJ上那题输入上下司关系是多组输入以0 0停止
+			add(up,down);
+		}
+		int i;
+		for(i=1;has_fa[i];i++);//找到究极boss
+		dfs(i);
+		cout<<max(dp[i][0],dp[i][1])<<endl;
+	}
+ } 
+
+
+
+
+
+
 
