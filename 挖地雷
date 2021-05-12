@@ -32,7 +32,7 @@ using namespace std;
 #define maxn 21
 
 int a[maxn];
-int g[maxn][maxn];//存图的
+int g[maxn][maxn];//存图的 
 int num[maxn];//存地雷数的
 int N;
 int son[maxn];//存后继
