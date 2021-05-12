@@ -31,7 +31,7 @@ int main()
 		for(ll j=M;j>=0;j--) //注意语句j>=0,因为题给数据会存在M==0
 		{
 			if(j>=e[i].num)
-			{
+			{ 
 				dp[j]=max(dp[j]+e[i].lose,dp[j-e[i].num]+e[i].win);//可能输的经验会比赢得经验更多，所以还是要取max
 			}
 			else
