@@ -52,5 +52,5 @@ int main()
 			dp[j]=max(dp[j],dp[j-y[i].time]+y[i].val);
 		}
 	}
-	cout<<dp[totaltime]<<endl;//答案即为可用时间为totaltime时的状态
+	cout<<dp[totaltime]<<endl;//答案即为可用时间为totaltime时的状态 
 }
