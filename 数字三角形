@@ -46,5 +46,5 @@ int main()
 			ans=max(a[i][j],ans);
 		}
 	}
-	cout<<ans<<endl;
+	cout<<ans<<endl; 
 }
