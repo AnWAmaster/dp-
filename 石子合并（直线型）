@@ -14,4 +14,64 @@ https://www.acwing.com/problem/content/284/
 因为对于一个大范围，他的合并代价一定是他的两个在相邻的前缀范围的和后缀范围的价值之和的最小值
 我们可以取遍历这个前缀和后缀的交界点作为一层循环
 
+我们可以初步得到三重循环的for的内容
+for(ll i=2;i<=N;i++)//区间的长度
+{
+  for(ll j=1;j+i-1<=N;j++)//区间的起点
+  {
+    ll end=j+i-1;//区间终点 
+    for(ll k=j;k<end;k++)//1~k为左区间，k+1~end为右区间 
+  }
+}
+
+那么状态转移方程也应该呼之欲出了，知道子状态即两个子范围的状态，就能得到当前状态
+dp1为区间代价最小值，dp2为区间代价最大值
+dp1[j][end]=min(dp1[j][end],dp1[j][k]+dp1[k+1][end]+sum[end]-sum[j-1]);
+dp2[j][end]=max(dp2[j][end],dp2[j][k]+dp2[k+1][end]+sum[end]-sum[j-1]);
+
+代码如下
+#include<iostream>
+#include<cstring>
+using namespace std;
+#define maxn 101
+
+typedef long long ll;
+
+ll a[maxn],dp1[maxn][maxn],dp2[maxn][maxn];
+ll sum[maxn];//前缀和 
+
+int main()
+{
+	ll N;
+	while(cin>>N)
+	{
+		memset(dp1,0,sizeof(dp1));
+		memset(dp2,0,sizeof(dp2));
+		sum[0]=0;
+		for(ll i=1;i<=N;i++)
+		{
+			cin>>a[i];
+			sum[i]=sum[i-1]+a[i];
+		}
+		for(ll i=2;i<=N;i++)//区间长度 
+		{
+			for(ll j=1;j+i-1<=N;j++)//区间起点 
+			{
+				ll end=j+i-1;//区间终点 
+				dp1[j][end]=1e9;//求最大值，所以值赋为无穷
+				dp2[j][end]=0;//值赋为0
+				for(ll k=j;k<end;k++)//1~k为左区间，k+1~end为右区间 
+				{
+					dp1[j][end]=min(dp1[j][end],dp1[j][k]+dp1[k+1][end]+sum[end]-sum[j-1]);
+					dp2[j][end]=max(dp2[j][end],dp2[j][k]+dp2[k+1][end]+sum[end]-sum[j-1]);
+				}
+			}
+		}
+		cout<<dp1[1][N]<<" "<<dp2[1][N]<<endl;
+	}
+}
+
+
+
+
 
