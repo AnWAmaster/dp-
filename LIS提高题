@@ -1,1 +1,55 @@
+原题链接：
+https://atcoder.jp/contests/chokudai_S001/tasks/chokudai_s001_h?lang=en
+
+题目大意：
+给出一个字符串，求单调递增子序列
+但是字符串长度N最大为1e5
+
+思路：
+用普通的O(n^2)会超时，这里要学习一下O(nlogn)的算法
+我们定义dp[i]为长度为i的多条单调递增子序列构成的集合中最小的末尾元素
+如一条子序列为1 3 5,另一条为2 3 4,则dp[3]==4
+
+假设当前已求出的最大的LIS长度为len,对于当前遍历到的字符a[i]
+如果a[i]>dp[len],易知可以更新最大LIS长度，操作为dp[++len]=a[i]
+但是如果a[i]<=len,则找出dp数组中第一个大于或等于a[i]的数，将其用a[i]替换（即lower_bound）
+
+为什么不直接舍弃长度比len小的dp数组呢？
+假设1 9 6 7这种数组
+对于前两个，得到dp[1]=1,dp[2]=9
+但是如果舍弃dp[1],原本应为1 6 7的长度为3的LIS将只能为2
+
+(对于第二种操作的可行性我还要去研究一下，感觉模模糊糊的，只能用归纳法证出来)
+
+AC代码：
+#include<iostream>
+#include<algorithm>
+using namespace std;
+#define maxn 100001
+int dp[maxn],a[maxn];
+
+int main()
+{
+	int N,cnt=0;
+	cin>>N;
+	for(int i=1;i<=N;i++)
+	{
+		cin>>a[i];
+	}
+	for(int i=1;i<=N;i++)
+	{
+		if(a[i]>dp[cnt])
+		{
+			dp[++cnt]=a[i];
+		}
+		else
+		{
+			int idx=lower_bound(dp+1,dp+cnt+1,a[i])-dp;
+			dp[idx]=a[i];
+		}
+	}
+	cout<<cnt<<endl;
+}
+
+
 
