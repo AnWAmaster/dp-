@@ -1,0 +1,71 @@
+原题链接
+https://vjudge.net/contest/439497#problem/E
+
+题目大意：
+给出一个N阶矩阵
+其中对称矩阵是一个k*k的矩阵，它的元素关于从左下角到右上角的对角线对称。
+求出它的最大对称子矩阵的边长。
+
+思路：
+令dp[i][j]表示以结点a[i][j]为左下角的矩阵有的对称矩阵的最大值
+
+我们可以思考一下
+如aba这么一个矩阵
+  bab
+  bbc
+ 当我们计算dp[3][1]时，
+ 我们可以先向上走，取得a[2][1]和a[1][1]
+ 再向右走，取得a[3][2]和a[3][3]
+ 比较对应的值,得到当前能获得的最大延伸长度len
+ 然后因为是动态规划，我们就把右上角元素即dp[2][2]作为子状态
+ 如果len>dp[2][2]即dp[3][1]=dp[2][2]+1,否则dp[3][1]=len;
+ 
+ AC代码
+ #include<iostream>
+using namespace std;
+#define maxn 1001
+
+int dp[maxn][maxn];
+char mp[maxn][maxn];
+
+int main()
+{
+	int N,MAX;
+	while(cin>>N&&N)
+	{
+		for(int i=1;i<=N;i++)
+		{
+			for(int j=1;j<=N;j++)
+			{
+				cin>>mp[i][j];
+				if(i==1)dp[i][j]=1;
+			}
+		}
+		MAX=1;
+		for(int i=2;i<=N;i++)
+		{
+			for(int j=1;j<=N;j++)
+			{
+				int temp=1;
+				for(int k=1;k<i;k++)
+				{
+					if(mp[i-k][j]!=mp[i][j+k])break;
+					temp++;
+				}
+				if(temp>dp[i-1][j+1])
+				{
+					dp[i][j]=dp[i-1][j+1]+1;
+				}
+				else
+				{
+					dp[i][j]=temp;
+				}
+				MAX=max(dp[i][j],MAX);
+			}
+		}
+		cout<<MAX<<endl;
+		
+	}
+}
+ 
+  
